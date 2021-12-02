@@ -8,17 +8,42 @@ function GameDisplay(props) {
     userName,
     userQuestions,
     userCorrectNumber,
-    userAnsweredNumber
+    userAnsweredNumber,
+    continueGame,
+    currentQuestionOrder,
+    setCurrentQuestionOrder,
+    answeredCorrect,
+    setAnswerCorrect,
+    userNumberChoice,
+    setUserNumberChoice
   } = props;
-  const [currentQuestion, SetCurrentQuestion] = useState("");
-  const [currentQuestionOrder, setCurrentQuestionOrder] = useState(0);
-  const [answeredCorrect, setAnswerCorrect] = useState(0);
+
+  //made changes from "" to {}, added currentQuestionIndex and totalQuestions
+  const [currentQuestion, SetCurrentQuestion] = useState({});
+  //const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // const [totalQuestions, setTotalQuestions] = useState(0);
+
+  useEffect(() => {
+    if (continueGame) {
+      setUserNumberChoice(userQuestions.length);
+      if (userAnsweredNumber !== 0) {
+        setAnswerCorrect(userCorrectNumber);
+        setCurrentQuestionOrder(userAnsweredNumber);
+      }
+    }
+  }, [
+    continueGame,
+    userCorrectNumber,
+    userAnsweredNumber,
+    setAnswerCorrect,
+    setCurrentQuestionOrder,
+    setUserNumberChoice,
+    userQuestions
+  ]);
 
   useEffect(() => {
     SetCurrentQuestion(userQuestions[currentQuestionOrder]);
     console.log(currentQuestion);
-    console.log("userCorrectNumber" + userCorrectNumber);
-    console.log("userAnsweredNumber" + userAnsweredNumber);
   }, [
     userQuestions,
     currentQuestion,
@@ -36,18 +61,23 @@ function GameDisplay(props) {
   }, [userName, userQuestions, answeredCorrect, currentQuestionOrder]);
 
   return (
-    <>
-      <h1>DisplayPage</h1>
-      {
-        <QuestionDisplay
-          currentQuestion={currentQuestion}
-          answeredCorrect={answeredCorrect}
-          setAnswerCorrect={setAnswerCorrect}
-          currentQuestionOrder={currentQuestionOrder}
-          setCurrentQuestionOrder={setCurrentQuestionOrder}
-        />
-      }
-    </>
+    <div className="gameDisplay">
+      <>
+        {/*<h1>DisplayPage</h1>*/}
+        {/* show Question Display if the current question is less than
+        the amount of user questions otherwise, show GameResult */}
+        {currentQuestionOrder < userQuestions.length ? (
+          <QuestionDisplay
+            currentQuestion={currentQuestion}
+            answeredCorrect={answeredCorrect}
+            setAnswerCorrect={setAnswerCorrect}
+            currentQuestionOrder={currentQuestionOrder}
+            setCurrentQuestionOrder={setCurrentQuestionOrder}
+            userNumberChoice={userNumberChoice}
+          />
+        ) : null}
+      </>
+    </div>
   );
 }
 
