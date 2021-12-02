@@ -1,0 +1,39 @@
+.resultSection {
+  position: absolute;
+  height: 200px;
+  width: 500px;
+  top: calc(50vh - 100px);
+  left: calc(50vw - 250px);
+  background-color:#8DAA91;
+  border-radius: 20px;
+  border:2px outset;
+  font-family: 'Press Start 2P', sans-serif;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size:1.5rem;
+  z-index: 1;
+
+  p {
+    margin: 0.5rem;
+  }
+
+  .resultUserName, span {
+    color:#d26121;
+  }
+
+  .quitButton {
+    border-radius: 5px;
+    background-color:lightgray;
+
+    &:hover {
+      color: #F8F4A6;
+      cursor: pointer;
+    }
+  
+    &:active {
+      color: #550e1b;
+    }
+  }
+}

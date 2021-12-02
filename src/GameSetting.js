@@ -13,7 +13,14 @@ function GameSetting(props) {
     setUserCorrectNumber,
     setUserAnsweredNumber,
     continueGame,
-    setContinueGame
+    setContinueGame,
+    userNumberChoice,
+    setUserNumberChoice,
+    setGameResultShows,
+    setAnswerCorrect,
+    setCurrentQuestionOrder,
+    setGameDisplayStart,
+    setOpenGameResultWindow
   } = props;
 
   const [userNameAlready, setUserNameAlready] = useState(false);
@@ -60,6 +67,10 @@ function GameSetting(props) {
     setUserCategoryChoice(e.target.value);
   };
 
+  const handleUserNumberChoice = (e) => {
+    setUserNumberChoice(e.target.value);
+  };
+
   const handleUserTypeChoice = (e) => {
     setUserTypeChoice(e.target.value);
   };
@@ -86,7 +97,8 @@ function GameSetting(props) {
     if (
       userCategoryChoice === "placeholder" ||
       userTypeChoice === "placeholder" ||
-      userDifficultyChoice === "placeholder"
+      userDifficultyChoice === "placeholder" ||
+      userNumberChoice === "placeholder"
     ) {
       alert(`Please select category, type and difficulty for your questions!`);
     } else {
@@ -124,12 +136,25 @@ function GameSetting(props) {
 
   useEffect(() => {
     if (questionSettingAlready && !existingUser) {
-      const triviaGameUrl = `https://opentdb.com/api.php?amount=11&category=${userCategoryChoice}&difficulty=${userDifficultyChoice}&type=${userTypeChoice}`;
+      const triviaGameUrl = `https://opentdb.com/api.php?amount=${userNumberChoice}&category=${userCategoryChoice}&difficulty=${userDifficultyChoice}&type=${userTypeChoice}`;
       axios({
         url: triviaGameUrl,
         method: "GET",
         responseType: "json"
       }).then((response) => {
+        const numberUserNumberChoice = parseInt(userNumberChoice, 10);
+        if (response.data.results.length !== numberUserNumberChoice) {
+          alert("Meet your requirements I cannot. Return home young Jedi.");
+          setGameResultShows(0);
+          setAnswerCorrect(0);
+          setCurrentQuestionOrder(0);
+          setQuestionSettingAlready(false);
+          setGameDisplayStart(false);
+          setOpenGameResultWindow(false);
+          setExistingUser(false);
+          setUserNameAlready(true);
+        }
+
         if (questionsAndAnswersFromApi === "") {
           setQuestionsAndAnswersFromApi(response.data.results);
         }
@@ -143,6 +168,7 @@ function GameSetting(props) {
       console.log(userCategoryChoice);
     }
   }, [
+    userNumberChoice,
     questionSettingAlready,
     questionsAndAnswersFromApi,
     userTypeChoice,
@@ -150,101 +176,106 @@ function GameSetting(props) {
     userCategoryChoice,
     setQuestionsAndAnswersFromApi,
     existingUser,
-    setUserQuestions
+    setUserQuestions,
+    setGameResultShows,
+    setAnswerCorrect,
+    setCurrentQuestionOrder,
+    setQuestionSettingAlready,
+    setGameDisplayStart,
+    setOpenGameResultWindow
   ]);
 
   return (
     <>
       <section>
         {!userNameAlready ? (
-          <form onSubmit={formSubmission}>
+          <form className="userNameInputForm" onSubmit={formSubmission}>
             <label htmlFor="userNameInput">
               Please enter your user name here:
             </label>
-            <input id="userNameInput" type="text" onChange={UserNameInput} />
-            <button onClick={UserNameSubmission}>Submit!</button>
+            <div>
+              <input id="userNameInput" type="text" onChange={UserNameInput} />
+              <button onClick={UserNameSubmission}>Submit!</button>
+            </div>
           </form>
         ) : null}
         {questionsAndAnswersFromApi ? null : questionSettingAlready ? null : userNameAlready &&
           existingUser ? (
-          <div>
+          <div className="continueOrNewGame">
             <button onClick={ContinueGameClick}>Continue your game?</button>
             <button onClick={ExistingUserClick}>Start a new game!</button>
           </div>
         ) : null}
         {questionSettingAlready ? null : !existingUser && userNameAlready ? (
-          <form onSubmit={formSubmission}>
-            {/* # of questions selected */}
-            <select
-              id="amountOfQuestionsSelection"
-              name="amountOfQuestionsSelection"
-              // value={userQuestionAmountChoice}
-              //   onChange={handleUserQuestionAmountChoice}
-            >
-              <option value="placeholder" disabled>
-                Choose your number of questions:
-              </option>
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
-            {/* Category selection */}
-            <select
-              id="categorySelection"
-              name="categorySelection"
-              value={userCategoryChoice}
-              onChange={handleUserCategoryChoice}
-            >
-              <option value="placeholder" disabled>
-                Choose your category:
-              </option>
-              <option value="21">Sport</option>
-              <option value="9">General Knowledge</option>
-              <option value="17">Science&Nature</option>
-              <option value="12">Music</option>
-              <option value="14">Television</option>
-              <option value="15">Video Games</option>
-              <option value="23">History</option>
-            </select>
-            {/* Type selection */}
-            <select
-              id="typeSelection"
-              name="typeSelection"
-              value={userTypeChoice}
-              onChange={handleUserTypeChoice}
-            >
-              <option value="placeholder" disabled>
-                Choose your type:
-              </option>
-              <option value="multiple">Multiple Choice</option>
-              <option value="boolean">True/False</option>
-            </select>
-            {/* Difficulty selection */}
-            <select
-              id="difficulty"
-              name="difficulty"
-              value={userDifficultyChoice}
-              onChange={handleUserDifficultyChoice}
-            >
-              <option value="placeholder" disabled>
-                Select difficulty:
-              </option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
+          <div className="dropdownSettingSection">
+            <form onSubmit={formSubmission}>
+              {/* # of questions selected */}
+              <select
+                id="amountOfQuestionsSelection"
+                name="amountOfQuestionsSelection"
+                value={userNumberChoice}
+                onChange={handleUserNumberChoice}
+              >
+                <option value="placeholder" disabled>
+                  Choose your number of questions:
+                </option>
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="7">7</option>
+                <option value="9">9</option>
+                <option value="11">11</option>
+              </select>
+              {/* Category selection */}
+              <select
+                id="categorySelection"
+                name="categorySelection"
+                value={userCategoryChoice}
+                onChange={handleUserCategoryChoice}
+              >
+                <option value="placeholder" disabled>
+                  Choose your category:
+                </option>
+                <option value="21">Sport</option>
+                <option value="9">General Knowledge</option>
+                <option value="17">Science&Nature</option>
+                <option value="12">Music</option>
+                <option value="14">Television</option>
+                <option value="15">Video Games</option>
+                <option value="23">History</option>
+              </select>
+              {/* Type selection */}
+              <select
+                id="typeSelection"
+                name="typeSelection"
+                value={userTypeChoice}
+                onChange={handleUserTypeChoice}
+              >
+                <option value="placeholder" disabled>
+                  Choose your type:
+                </option>
+                <option value="multiple">Multiple Choice</option>
+                <option value="boolean">True/False</option>
+              </select>
+              {/* Difficulty selection */}
+              <select
+                id="difficulty"
+                name="difficulty"
+                value={userDifficultyChoice}
+                onChange={handleUserDifficultyChoice}
+              >
+                <option value="placeholder" disabled>
+                  Select difficulty:
+                </option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </form>
             <button onClick={QuestionSettingSubmission}>
               Questions Generating!
             </button>
-          </form>
+          </div>
         ) : null}
       </section>
     </>
